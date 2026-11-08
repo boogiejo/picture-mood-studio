@@ -100,32 +100,26 @@ function Index() {
   const pct = (v: number) => `${Math.round(v)}%`;
   const signed = (v: number) => (v > 0 ? `+${v}` : `${v}`);
 
-  // Warmth/tint color matrix
-  const w = s.warmth / 100 * 0.15, t = s.tint / 100 * 0.12;
-  const matrix = `${1 + w} 0 0 0 0  0 ${1 - t} 0 0 0  0 0 ${1 - w} 0 0  0 0 0 1 0`;
-  const k = s.sharpness / 100 * 1.2;
-  const kernel = `0 ${-k} 0 ${-k} ${1 + 4 * k} ${-k} 0 ${-k} 0`;
-  const exp = 1 / s.gamma;
-
+  // Gamma approximated with a brightness/contrast curve (gamma < 1 lifts midtones)
+  const gB = Math.pow(1 / s.gamma, 0.35);
+  const gC = Math.pow(s.gamma, 0.15);
+  const sharpC = 1 + s.sharpness / 100 * 0.15;
   const filter = [
-    "url(#pic)",
-    `brightness(${s.brightness}%)`, `contrast(${s.contrast}%)`, `saturate(${s.saturation}%)`,
-    `hue-rotate(${s.hue}deg)`, `grayscale(${s.bw}%)`, `sepia(${s.sepia}%)`,
+    `brightness(${(s.brightness / 100 * gB).toFixed(3)})`,
+    `contrast(${(s.contrast / 100 * gC * sharpC).toFixed(3)})`,
+    `saturate(${s.saturation / 100})`,
+    `hue-rotate(${s.hue}deg)`,
+    `sepia(${s.sepia / 100})`,
+    `grayscale(${s.bw / 100})`,
     SOFT_PX[s.soften] ? `blur(${SOFT_PX[s.soften]}px)` : "",
   ].join(" ");
-  const transform = `scale(${(s.mirror ? -1 : 1) * s.zoom / 100}, ${s.zoom / 100}) rotate(${s.flip ? 180 : 0}deg)`;
+  const z = s.zoom / 100;
+  const transform = `scale(${z}) scaleX(${s.mirror ? -1 : 1}) scaleY(${s.flip ? -1 : 1})`;
+  const warmTint = `oklch(0.7 0.2 ${s.warmth >= 0 ? 60 : 250} / ${Math.abs(s.warmth) / 100 * 0.25})`;
+  const tintCol = `oklch(0.7 0.2 ${s.tint >= 0 ? 330 : 145} / ${Math.abs(s.tint) / 100 * 0.2})`;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <svg width="0" height="0" className="absolute">
-        <filter id="pic" colorInterpolationFilters="sRGB">
-          <feComponentTransfer>
-            <feFuncR type="gamma" exponent={exp} /><feFuncG type="gamma" exponent={exp} /><feFuncB type="gamma" exponent={exp} />
-          </feComponentTransfer>
-          <feColorMatrix type="matrix" values={matrix} />
-          {k > 0 && <feConvolveMatrix order="3" kernelMatrix={kernel} preserveAlpha="true" />}
-        </filter>
-      </svg>
       <div className="mx-auto grid max-w-6xl gap-8 p-6 lg:grid-cols-[1fr_380px]">
         <div className="relative self-start lg:sticky lg:top-6">
           {s.ambient && (
@@ -134,6 +128,8 @@ function Index() {
           <div className="relative aspect-video overflow-hidden rounded-xl border border-border bg-background">
             <img src={preview} alt="Preview" width={1280} height={768} className="h-full w-full transition-[filter,transform] duration-300"
               style={{ filter, transform, objectFit: s.fit }} />
+            <div className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: warmTint }} />
+            <div className="pointer-events-none absolute inset-0 mix-blend-soft-light" style={{ background: tintCol }} />
             <div className="pointer-events-none absolute inset-0"
               style={{ boxShadow: `inset 0 0 ${s.vignette * 2.4}px ${s.vignette * 1.2}px oklch(0 0 0 / ${s.vignette / 100})` }} />
           </div>
