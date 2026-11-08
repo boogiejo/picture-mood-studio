@@ -2,7 +2,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { cx } from "./cx";
 import { RangeSlider, SegmentedControl, SettingsSection, SwitchRow } from "./primitives";
-import type { FitMode, PictureSettings, PictureSettingsPatch, PresetMap, Soften } from "./types";
+import type { FitMode, PictureSettings, PictureSettingsPatch, Soften } from "./types";
 
 const SOFTEN_OPTIONS: { value: Soften; label: string }[] = (["Off", "Low", "Med", "High"] as Soften[]).map(
   (value) => ({ value, label: value }),
@@ -22,7 +22,6 @@ export type PictureSettingsPanelProps = {
   settings: PictureSettings;
   /** Preset name shown in the header. */
   activePreset: string;
-  presets: PresetMap;
   presetNames: string[];
   /** Apply values and mark the picture as custom. */
   onPatch: (next: PictureSettingsPatch) => void;
@@ -30,7 +29,7 @@ export type PictureSettingsPanelProps = {
   onReset: () => void;
   onBack?: (() => void) | undefined;
   /** Label beside the back arrow. */
-  backLabel?: string;
+  backLabel?: string | undefined;
   className?: string | undefined;
 };
 

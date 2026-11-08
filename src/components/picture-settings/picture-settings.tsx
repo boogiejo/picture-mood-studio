@@ -56,7 +56,6 @@ export function PictureSettingsControl({
       <PictureSettingsPanel
         settings={settings}
         activePreset={activePreset}
-        presets={presets ?? {}}
         presetNames={presetNames}
         onPatch={patch}
         onPreset={applyPreset}
