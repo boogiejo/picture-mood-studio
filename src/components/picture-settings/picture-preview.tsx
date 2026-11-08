@@ -1,6 +1,5 @@
 import { cx } from "./cx";
 import { buildPictureEffects } from "./effects";
-import "./picture-settings.css";
 import type { PictureSettings } from "./types";
 
 export type PicturePreviewProps = {
