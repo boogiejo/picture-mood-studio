@@ -37,7 +37,6 @@ export type PictureSettingsPanelProps = {
 export function PictureSettingsPanel({
   settings,
   activePreset,
-  presets,
   presetNames,
   onPatch,
   onPreset,
