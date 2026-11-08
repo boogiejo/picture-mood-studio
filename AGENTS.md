@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+
+- Reusable UI ships as a self-contained folder under `src/components/<name>/` with an `index.ts` barrel, its own CSS file, and a README; nothing outside the folder is imported except React and published packages, so the folder can be copied into another project as-is.
